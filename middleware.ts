@@ -1,22 +1,18 @@
-import { withAuth } from 'next-auth/middleware';
+﻿import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth({
-  callbacks: {
-    authorized: ({ token }) => {
-      // لو فيه session/token اعتبره مسموح
-      return !!token;
-    },
-  },
-});
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('next-auth.session-token')?.value;
 
-// تحديد الصفحات المحمية
+  // لو مش موجود توكن يرجعه للصفحة الرئيسية
+  if (!token) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // ممكن هنا تضيف لوجيك إضافي للفصل بين الأدوار مثل ممرض / مستشفى
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: [
-    // هنا بتحمي أي صفحة داخل هذه المسارات
-    '/nurse/:path*',
-    '/hospital/:path*',
-    '/jobs/:path*',
-    '/store/checkout', 
-    '/training/:path*',
-  ],
+  matcher: ['/nurse/:path*', '/hospital/:path*'], // حمايه ممرض ومستشفى فقط
 };
