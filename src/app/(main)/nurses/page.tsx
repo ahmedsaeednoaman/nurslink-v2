@@ -18,7 +18,7 @@ async function getNurses() {
           <p className="text-gray-500">لا يوجد ممرضين بعد.</p>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {nurses.map((nurse: any) => (
+            {nurses.map((nurse: { id: number; name: string; specialty: string; bio: string; rating: number }) => (
               <div
                 key={nurse.id}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-all"
@@ -35,3 +35,4 @@ async function getNurses() {
     )
   }
   
+
