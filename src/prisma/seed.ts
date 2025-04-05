@@ -1,20 +1,35 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.job.createMany({
+  const hashedAdminPassword = await bcrypt.hash('admin123', 10);
+  const hashedNursePassword = await bcrypt.hash('nurse123', 10);
+
+  await prisma.user.createMany({
     data: [
-      { title: "ممرض طوارئ", location: "القاهرة", experience: "3 سنوات" },
-      { title: "ممرضة أطفال", location: "دبي", experience: "5 سنوات" },
-      { title: "ممرض عناية مركزة", location: "الرياض", experience: "4 سنوات" },
+      {
+        email: 'admin@nurslink.com',
+        password: hashedAdminPassword,
+        name: 'Admin User',
+        role: 'ADMIN',   // <-- ???????
+      },
+      {
+        email: 'nurse@nurslink.com',
+        password: hashedNursePassword,
+        name: 'Nurse User',
+        role: 'NURSE',   // <-- ???????
+      }
     ],
+    skipDuplicates: true
   });
 }
 
 main()
-  .then(() => console.log('Seeding finished.'))
-  .catch((e) => console.error(e))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
   .finally(async () => {
-    await prisma.$disconnect();
   });
